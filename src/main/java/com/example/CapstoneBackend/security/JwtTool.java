@@ -1,8 +1,8 @@
 package com.example.CapstoneBackend.security;
 
-import epicode.BW5T1.exception.NotFoundException;
-import epicode.BW5T1.model.User;
-import epicode.BW5T1.service.UserService;
+import com.example.CapstoneBackend.exception.NotFoundException;
+import com.example.CapstoneBackend.model.User;
+import com.example.CapstoneBackend.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;

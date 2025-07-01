@@ -1,6 +1,6 @@
 package com.example.CapstoneBackend.model;
 
-import epicode.BW5T1.enumeration.Ruolo;
+import com.example.CapstoneBackend.enumeration.Ruolo;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
