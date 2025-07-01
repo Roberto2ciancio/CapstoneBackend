@@ -11,7 +11,7 @@ public class UserDto {
     @NotEmpty(message = "Obbligatorio inserire cognome")
     private String cognome;
     @Email(message = "Obbligatorio inserire email (indirizzo@epicode.it)")
-    private String email;
+    private String Email;
     @NotEmpty(message = "Obbligatorio inserire username")
     private String username;
     @NotEmpty(message = "Obbligatorio inserire password")

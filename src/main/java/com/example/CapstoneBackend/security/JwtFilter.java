@@ -1,14 +1,13 @@
 package com.example.CapstoneBackend.security;
 
 import com.example.CapstoneBackend.exception.NotFoundException;
-import  com.example.CapstoneBackend.exception.UnAuthorizedException;
+import com.example.CapstoneBackend.exception.UnAuthorizedException;
 import com.example.CapstoneBackend.model.User;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,55 +18,52 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Arrays;
 
-
 @Component
-
 public class JwtFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtTool jwtTool;
+    private final JwtTool jwtTool;
+
+    public JwtFilter(JwtTool jwtTool) {
+        this.jwtTool = jwtTool;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        try {
+            // Controlla prima se non dovrebbe filtrare
+            if (shouldNotFilter(request)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
 
+            String authorization = request.getHeader("Authorization");
 
-        String authorization = request.getHeader("Authorization");
-
-        if (authorization == null || !authorization.startsWith("Bearer ")) {
-            throw new UnAuthorizedException("Token non presente, non sei autorizzato ad usare il servizio richiesto");
-        } else {
+            if (authorization == null || !authorization.startsWith("Bearer ")) {
+                throw new UnAuthorizedException("Token non presente, non sei autorizzato ad usare il servizio richiesto");
+            }
+            
             //estraggo il token
             String token = authorization.substring(7);
 
             //verifico che il token sia valido
             jwtTool.validateToken(token);
 
-            try {
-                //recupero l'utente collegato al token usando il metodo getUserFromToken del jwtTool
-                User user = jwtTool.getUserFromToken(token);
+            //recupero l'utente collegato al token usando il metodo getUserFromToken del jwtTool
+            User user = jwtTool.getUserFromToken(token);
 
-                //creo un oggetto authentication inserendogli all'interno l'utente recuperato e il suo ruolo
-                Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                //aggiungo l'autenticazione con l'utente nel contesto di Spring security
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (NotFoundException e) {
-                throw new UnAuthorizedException("Utente collegato al token non trovato");
-            }
-
+            //creo un oggetto authentication inserendogli all'interno l'utente recuperato e il suo ruolo
+            Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+            //aggiungo l'autenticazione con l'utente nel contesto di Spring security
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);
+        } catch (UnAuthorizedException | NotFoundException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
         }
-
     }
 
-    //questo metodo evita che gli endpoint di registrazione e login possano richiedere il token
-    /*
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return new AntPathMatcher().match("/auth/**", request.getServletPath());
-    } */
-
-    //ho cambiato il metodo shouldNotFilter per ospitare più path da non filtrare
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String[] excludedEndpoints = new String[]{"/auth/**", "/html/**"};

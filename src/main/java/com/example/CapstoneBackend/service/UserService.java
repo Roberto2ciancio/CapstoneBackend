@@ -26,13 +26,16 @@ import java.util.Collections;
 
 @Service
 public class UserService {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    // Altri campi...
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder/* altri parametri */) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        // Inizializzazione altri campi...
+    }
+    
     @Autowired
     private Cloudinary cloudinary;
 
@@ -109,4 +112,3 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("Utente non trovato"));
     }
 }
-
