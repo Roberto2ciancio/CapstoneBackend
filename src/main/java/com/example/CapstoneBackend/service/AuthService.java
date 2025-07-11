@@ -1,6 +1,7 @@
 package com.example.CapstoneBackend.service;
 
 import com.example.CapstoneBackend.dto.LoginDto;
+import com.example.CapstoneBackend.dto.LoginResponseDto;
 import com.example.CapstoneBackend.exception.NotFoundException;
 import com.example.CapstoneBackend.model.User;
 import com.example.CapstoneBackend.repository.UserRepository;
@@ -21,15 +22,21 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public String login(LoginDto loginDto) throws NotFoundException {
-        User user = userRepository.findByUsername(loginDto.getUsername()).
-                orElseThrow(() -> new NotFoundException("Utente con questo username/password non trovato"));
+    public LoginResponseDto login(LoginDto loginDto) throws NotFoundException {
+        User user = userRepository.findByUsername(loginDto.getUsername())
+                .orElseThrow(() -> new NotFoundException("Utente con questo username/password non trovato"));
 
-        if(passwordEncoder.matches(loginDto.getPassword(), user.getPassword())){
-
-            return jwtTool.createToken(user);
-        }
-        else{
+        if(passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
+            LoginResponseDto response = new LoginResponseDto();
+            response.setToken(jwtTool.createToken(user));
+            response.setUsername(user.getUsername());
+            response.setRuolo(user.getRuolo());
+            response.setNome(user.getNome());
+            response.setCognome(user.getCognome());
+            response.setAvatar(user.getAvatar());
+            
+            return response;
+        } else {
             throw new NotFoundException("Utente con questo username/password non trovato");
         }
     }

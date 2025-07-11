@@ -7,6 +7,7 @@ import com.example.CapstoneBackend.enumeration.Ruolo;
 import com.example.CapstoneBackend.exception.NotFoundException;
 import com.example.CapstoneBackend.model.User;
 import com.example.CapstoneBackend.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,7 @@ import java.util.Collections;
 
 @Service
 public class UserService {
+    // ... altri metodi ...
 
     @Autowired
     private UserRepository userRepository;
@@ -108,5 +110,6 @@ public class UserService {
         return userRepository.findByUsername(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Utente non trovato"));
     }
-}
 
+
+}
