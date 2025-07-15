@@ -70,9 +70,10 @@ public class JwtFilter extends OncePerRequestFilter {
     //ho cambiato il metodo shouldNotFilter per ospitare più path da non filtrare
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String[] excludedEndpoints = new String[]{"/auth/**", "/html/**"};
-
+        String[] excludedEndpoints = new String[]{"/auth/**", "/html/**", "/api/pc-cards/**"};
+    
         return Arrays.stream(excludedEndpoints)
-                .anyMatch(e -> new AntPathMatcher().match(e, request.getServletPath()));
+                .anyMatch(e -> new AntPathMatcher().match(e, request.getServletPath())) ||
+            (request.getMethod().equals("GET") && new AntPathMatcher().match("/api/pc-cards/**", request.getServletPath()));
     }
 }

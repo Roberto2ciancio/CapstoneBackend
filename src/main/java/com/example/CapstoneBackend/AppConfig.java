@@ -1,13 +1,19 @@
 package com.example.CapstoneBackend;
 
 import com.cloudinary.Cloudinary;
+import com.example.CapstoneBackend.security.JwtFilter;
+import com.example.CapstoneBackend.security.JwtTool;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -28,34 +34,22 @@ public class AppConfig {
         return new Cloudinary(configCloudinary);
     }
 
-    @Bean
-    public JavaMailSenderImpl getJavaMailSender(@Value("${gmail.mail.transport.protocol}" )String protocol,
-                                                @Value("${gmail.mail.smtp.auth}" ) String auth,
-                                                @Value("${gmail.mail.smtp.starttls.enable}" )String starttls,
-                                                @Value("${gmail.mail.debug}" )String debug,
-                                                @Value("${gmail.mail.from}" )String from,
-                                                @Value("${gmail.mail.from.password}" )String password,
-                                                @Value("${gmail.smtp.ssl.enable}" )String ssl,
-                                                @Value("${gmail.smtp.host}" )String host,
-                                                @Value("${gmail.smtp.port}" )String port){
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost(host);
-        mailSender.setPort(Integer.parseInt(port));
-
-        mailSender.setUsername(from);
-        mailSender.setPassword(password);
-
-        Properties props = mailSender.getJavaMailProperties();
-        props.put("mail.transport.protocol", protocol);
-        props.put("mail.smtp.auth", auth);
-        props.put("mail.smtp.starttls.enable", starttls);
-        props.put("mail.debug", debug);
-        props.put("mail.smtp.ssl.enable",ssl);
-        props.put("mail.smtp.ssl.trust", host);
-
-        return mailSender;
-
-    }
+@Bean
+public JavaMailSenderImpl getJavaMailSender() {
+    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+    mailSender.setHost("smtp.gmail.com");
+    mailSender.setPort(587);
+    mailSender.setUsername("${gmail.mail.from}");
+    mailSender.setPassword("${gmail.mail.from.password}");
+    
+    Properties props = mailSender.getJavaMailProperties();
+    props.put("mail.transport.protocol", "smtp");
+    props.put("mail.smtp.auth", "true");
+    props.put("mail.smtp.starttls.enable", "true");
+    props.put("mail.debug", "true");
+    
+    return mailSender;
+}
 
     @Bean(name = "provinceCsvFile")
     public File provinceCsvFile() {
@@ -65,5 +59,26 @@ public class AppConfig {
     @Bean(name = "comuniCsvFile")
     public File comuniCsvFile() {
         return new File("src/main/resources/comuni-italiani.csv");
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // Instead of using setAllowedOrigins with "*", we use setAllowedOriginPatterns
+        // This allows all origins while still allowing credentials
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")); // Allow all methods
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers")); // Allow all headers
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L); // 1 hour
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Apply to all paths
+        return source;
+    }
+
+    @Bean
+    public JwtFilter jwtFilter() {
+        return new JwtFilter();
     }
 }
