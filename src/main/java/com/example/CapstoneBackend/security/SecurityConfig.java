@@ -1,5 +1,6 @@
 package com.example.CapstoneBackend.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,11 +12,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private JwtFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -27,19 +32,21 @@ public class SecurityConfig {
         //serve per bloccare richieste che provengono da domini(indirizzo ip e porta) esterni a quelli del servizio
         httpSecurity.cors(Customizer.withDefaults());
 
+        // Add JWT filter before the UsernamePasswordAuthenticationFilter
+        httpSecurity.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+        // Public endpoints
         httpSecurity.authorizeHttpRequests(http->http.requestMatchers("/auth/**").permitAll());
-
         httpSecurity.authorizeHttpRequests(http->http.requestMatchers("/import/**").permitAll());
-
-        httpSecurity.authorizeHttpRequests(http->http.requestMatchers(HttpMethod.GET).permitAll());
-        httpSecurity.authorizeHttpRequests(http->http.requestMatchers(HttpMethod.POST).permitAll());
-        httpSecurity.authorizeHttpRequests(http->http.requestMatchers(HttpMethod.PUT).permitAll());
-        httpSecurity.authorizeHttpRequests(http->http.requestMatchers(HttpMethod.DELETE).permitAll());
-        httpSecurity.authorizeHttpRequests(http->http.requestMatchers(HttpMethod.PATCH).permitAll());
-
-
-        httpSecurity.authorizeHttpRequests(http->http.anyRequest().denyAll());
-
+        
+        // Allow public GET requests for PC cards (shop browsing)
+        httpSecurity.authorizeHttpRequests(http->http.requestMatchers(HttpMethod.GET, "/api/pcCards/**").permitAll());
+        
+        // Admin-only endpoints for PC cards management
+        httpSecurity.authorizeHttpRequests(http->http.requestMatchers("/api/pcCards/admin/**").hasAuthority("ADMIN"));
+        
+        // Any other request requires authentication
+        httpSecurity.authorizeHttpRequests(http->http.anyRequest().authenticated());
 
         return httpSecurity.build();
     }
