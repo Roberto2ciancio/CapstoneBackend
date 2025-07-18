@@ -28,4 +28,22 @@ public class CustomizedExceptionHandler {
         error.setDataErrore(LocalDateTime.now());
         return error;
     }
+
+    @ExceptionHandler(UnAuthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiError unauthorizedExceptionHandler(UnAuthorizedException e){
+        ApiError error = new ApiError();
+        error.setMessaggio(e.getMessage());
+        error.setDataErrore(LocalDateTime.now());
+        return error;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiError accessDeniedExceptionHandler(AccessDeniedException e){
+        ApiError error = new ApiError();
+        error.setMessaggio(e.getMessage());
+        error.setDataErrore(LocalDateTime.now());
+        return error;
+    }
 }

@@ -77,7 +77,8 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/pcCards/{id:[\\d+]}",
             "/api/pcCards/search",
             "/api/pcCards/brand/**",
-            "/api/pcCards/price-range"
+            "/api/pcCards/price-range",
+            "/api/debug/whoami"
         };
 
         return Arrays.stream(excludedEndpoints)
