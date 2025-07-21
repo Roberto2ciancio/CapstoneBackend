@@ -18,15 +18,15 @@ public class PcCardService {
     @Autowired
     private PcCardRepository pcCardRepository;
     
-    private void verificaAdmin(User user) {
-        if (user.getRuolo() != Ruolo.ADMIN) {
-            throw new UnAuthorizedException("Solo gli amministratori possono modificare le card");
-        }
-    }
+    // private void verificaAdmin(User user) {
+     //   if (user.getRuolo() != Ruolo.ADMIN) {
+     //       throw new UnAuthorizedException("Solo gli amministratori possono modificare le card");
+    //    }
+   // }
 
     // Create
     public PcCard createCard(PcCardDto cardDto, User currentUser) {
-        verificaAdmin(currentUser);
+      //  verificaAdmin(currentUser);
         
         PcCard card = new PcCard();
         return salvaCard(card, cardDto);
@@ -45,7 +45,7 @@ public class PcCardService {
 
     // Update
     public PcCard updateCard(Long id, PcCardDto cardDto, User currentUser) {
-        verificaAdmin(currentUser);
+       // verificaAdmin(currentUser);
         
         PcCard esistente = pcCardRepository.findById(id)
             .orElseThrow(() -> new NotFoundException("Card non trovata con id: " + id));
@@ -55,7 +55,7 @@ public class PcCardService {
 
     // Delete
     public void deleteCard(Long id, User currentUser) {
-        verificaAdmin(currentUser);
+       // verificaAdmin(currentUser);
         
         if (!pcCardRepository.existsById(id)) {
             throw new NotFoundException("Card non trovata con id: " + id);

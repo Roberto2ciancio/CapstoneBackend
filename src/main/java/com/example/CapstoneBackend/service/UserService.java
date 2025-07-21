@@ -45,6 +45,7 @@ public class UserService {
     private MailService mailService;
 
 
+
     public User saveUser(UserDto userDto){
         User user = new User();
         user.setNome(userDto.getNome());
@@ -105,9 +106,9 @@ public class UserService {
 
     public User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName(); // oppure getPrincipal() se hai un oggetto custom
+        String username = authentication.getName();
 
-        return userRepository.findByUsername(email)
+        return userRepository.findByEmail(username)  // Cambiato da findByUsername a findByEmail
                 .orElseThrow(() -> new UsernameNotFoundException("Utente non trovato"));
     }
 
