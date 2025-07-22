@@ -106,10 +106,21 @@ public class UserService {
 
     public User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-
-        return userRepository.findByEmail(username)  // Cambiato da findByUsername a findByEmail
-                .orElseThrow(() -> new UsernameNotFoundException("Utente non trovato"));
+        
+        if (authentication == null) {
+            throw new UsernameNotFoundException("Nessun utente autenticato trovato");
+        }
+        
+        Object principal = authentication.getPrincipal();
+        
+        if (principal instanceof User) {
+            return (User) principal;
+        } else if (principal instanceof String) {
+            return userRepository.findByUsername((String) principal)
+                .orElseThrow(() -> new UsernameNotFoundException("Utente non trovato con username: " + principal));
+        }
+        
+        throw new UsernameNotFoundException("Tipo di autenticazione non supportato");
     }
 
 
