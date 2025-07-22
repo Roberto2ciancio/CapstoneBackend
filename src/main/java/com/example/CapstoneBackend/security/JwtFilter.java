@@ -30,7 +30,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) 
             throws ServletException, IOException {
         
-        // Se l'endpoint non richiede filtro, prosegui
+
         if (shouldNotFilter(request)) {
             filterChain.doFilter(request, response);
             return;
@@ -59,7 +59,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String[] excludedEndpoints = {"/auth/**", "/html/**", "/api/pc-cards/**"}; // rimosso /api/send-confirmation
+        String[] excludedEndpoints = {"/auth/**", "/html/**", "/api/pc-cards/**"};
         
         return Arrays.stream(excludedEndpoints)
                 .anyMatch(pattern -> new AntPathMatcher().match(pattern, request.getServletPath()));

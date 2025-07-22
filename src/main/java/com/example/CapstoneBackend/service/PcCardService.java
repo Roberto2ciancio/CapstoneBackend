@@ -18,13 +18,9 @@ public class PcCardService {
     @Autowired
     private PcCardRepository pcCardRepository;
     
-    // private void verificaAdmin(User user) {
-     //   if (user.getRuolo() != Ruolo.ADMIN) {
-     //       throw new UnAuthorizedException("Solo gli amministratori possono modificare le card");
-    //    }
-   // }
 
-    // Create
+
+
     public PcCard createCard(PcCardDto cardDto, User currentUser) {
       //  verificaAdmin(currentUser);
         
