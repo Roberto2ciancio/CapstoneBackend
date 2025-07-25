@@ -21,7 +21,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/api/pc-cards/**").permitAll()
-                .requestMatchers("/api/send-confirmation").permitAll()  // Aggiunta questa riga
+                .requestMatchers("/api/send-confirmation").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
