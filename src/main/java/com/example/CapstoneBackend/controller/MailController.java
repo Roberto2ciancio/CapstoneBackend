@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class MailController {
     
-    @Value("${env.gmail.mail.from}")
+    @Value("${spring.mail.username}")
     private String mittente;
     
     @Autowired
