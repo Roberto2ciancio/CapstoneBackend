@@ -28,6 +28,9 @@ import java.util.Collections;
 @Service
 public class UserService {
 
+    @Autowired
+    private com.example.CapstoneBackend.security.AdminUsernames adminUsernames;
+
 
     @Autowired
     private UserRepository userRepository;
@@ -53,7 +56,7 @@ public class UserService {
         user.setUsername(userDto.getUsername());
         user.setEmail(userDto.getEmail());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setRuolo(Ruolo.USER);
+        user.setRuolo(adminUsernames.isAdmin(userDto.getUsername()) ? Ruolo.ADMIN : Ruolo.USER);
 
         return userRepository.save(user);
     }

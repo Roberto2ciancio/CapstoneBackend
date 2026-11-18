@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     @Autowired
+    private com.example.CapstoneBackend.security.AdminUsernames adminUsernames;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -27,6 +30,10 @@ public class AuthService {
                 .orElseThrow(() -> new NotFoundException("Utente con questo username/password non trovato"));
 
         if(passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
+            if (adminUsernames.isAdmin(user.getUsername()) && user.getRuolo() != com.example.CapstoneBackend.enumeration.Ruolo.ADMIN) {
+                user.setRuolo(com.example.CapstoneBackend.enumeration.Ruolo.ADMIN);
+                userRepository.save(user);
+            }
             LoginResponseDto response = new LoginResponseDto();
             response.setToken(jwtTool.createToken(user));
             response.setUsername(user.getUsername());
